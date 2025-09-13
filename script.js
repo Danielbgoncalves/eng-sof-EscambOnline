@@ -1,4 +1,3 @@
-// Global state
 let posts = [];
 let favorites = [];
 let currentUser = {
@@ -95,7 +94,6 @@ function showPage(pageId) {
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
 
-    // Update navigation
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
 }
 
