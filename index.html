@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EscambOnline - Classificados</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <h2>EscambOnline</h2>
+            </div>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Buscar itens para troca...">
+                <button onclick="searchItems()">🔍</button>
+            </div>
+            <div class="header-actions">
+                <button class="btn-secondary" onclick="toggleFavorites()">❤️ Favoritos</button>
+                <button class="btn-primary" onclick="showCreatePost()">+ Anunciar</button>
+                <button class="btn-secondary" onclick="showProfile()">Perfil</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <button class="nav-btn active" onclick="showAllPosts()">🏠 Todos</button>
+            <button class="nav-btn" onclick="filterCategory('troca')">🔄 Trocas</button>
+            <button class="nav-btn" onclick="filterCategory('venda')">💰 Vendas</button>
+            <button class="nav-btn" onclick="filterCategory('eletrônicos')">📱 Eletrônicos</button>
+            <button class="nav-btn" onclick="filterCategory('móveis')">🪑 Móveis</button>
+            <button class="nav-btn" onclick="filterCategory('games')">🎮 Games</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main" id="mainContent">
+        <!-- Home Page -->
+        <div id="homePage" class="page active">
+            <div class="filters">
+                <select id="priceFilter" onchange="applyFilters()">
+                    <option value="">Preço</option>
+                    <option value="0-50">R$ 0 - R$ 50</option>
+                    <option value="50-100">R$ 50 - R$ 100</option>
+                    <option value="100-500">R$ 100 - R$ 500</option>
+                    <option value="500+">R$ 500+</option>
+                </select>
+                <select id="locationFilter" onchange="applyFilters()">
+                    <option value="">Localização</option>
+                    <option value="centro">Centro</option>
+                    <option value="zona-norte">Zona Norte</option>
+                    <option value="zona-sul">Zona Sul</option>
+                    <option value="zona-leste">Zona Leste</option>
+                    <option value="zona-oeste">Zona Oeste</option>
+                </select>
+            </div>
+
+            <div class="posts-grid" id="postsGrid">
+                <!-- Posts will be dynamically loaded here -->
+            </div>
+        </div>
+
+        <!-- Create Post Page -->
+        <div id="createPostPage" class="page">
+            <div class="create-post-container">
+                <div class="create-post-header">
+                    <button class="btn-back" onclick="showHomePage()">← Voltar</button>
+                    <h2>Criar Novo Anúncio</h2>
+                </div>
+
+                <form id="createPostForm" class="create-form">
+                    <div class="form-group">
+                        <label for="postTitle">Título do Anúncio</label>
+                        <input type="text" id="postTitle" placeholder="Ex: Mouse Gamer RGB" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="postDescription">Descrição</label>
+                        <textarea id="postDescription" placeholder="Descreva seu item..." required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="postType">Tipo</label>
+                            <select id="postType" required>
+                                <option value="">Selecione</option>
+                                <option value="venda">Venda</option>
+                                <option value="troca">Troca</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="postPrice">Preço (R$)</label>
+                            <input type="number" id="postPrice" placeholder="0,00" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="postCategory">Categoria</label>
+                            <select id="postCategory" required>
+                                <option value="">Selecione</option>
+                                <option value="eletrônicos">Eletrônicos</option>
+                                <option value="móveis">Móveis</option>
+                                <option value="games">Games</option>
+                                <option value="roupas">Roupas</option>
+                                <option value="livros">Livros</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="postLocation">Localização</label>
+                            <select id="postLocation" required>
+                                <option value="">Selecione</option>
+                                <option value="centro">Centro</option>
+                                <option value="zona-norte">Zona Norte</option>
+                                <option value="zona-sul">Zona Sul</option>
+                                <option value="zona-leste">Zona Leste</option>
+                                <option value="zona-oeste">Zona Oeste</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="postImages">Imagens</label>
+                        <div class="image-upload">
+                            <input type="file" id="postImages" multiple accept="image/*" onchange="previewImages()">
+                            <div class="image-preview" id="imagePreview"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-create">Publicar Anúncio</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Post Detail Page -->
+        <div id="postDetailPage" class="page">
+            <div class="post-detail-container">
+                <div class="post-detail-header">
+                    <button class="btn-back" onclick="showHomePage()">← Voltar</button>
+                </div>
+                <div id="postDetailContent">
+                    <!-- Post details will be loaded here -->
+                </div>
+            </div>
+        </div>
+        <!-- Chat Page -->
+        <div id="chatPage" class="page">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <button class="btn-back" onclick="showHomePage()">← Voltar</button>
+                    <h2>Chat do anúncio</h2>
+                </div>
+                <div class="chat-messages" id="chatMessages"></div>
+                <form class="chat-form" onsubmit="sendChatMessage(event)">
+                    <input type="text" id="chatInput" placeholder="Digite sua mensagem..." autocomplete="off" required>
+                    <button type="submit" class="btn-chat">Enviar</button>
+                </form>
+            </div>
+        </div>
+        <!-- Profile Page -->
+        <div id="profilePage" class="page">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <button class="btn-back" onclick="showHomePage()">← Voltar</button>
+                    <h2>Meu Perfil</h2>
+                </div>
+
+                <div class="profile-content">
+                    <div class="profile-info">
+                        <div class="profile-avatar">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iNTAiIGZpbGw9IiNlNTM5MzUiLz4KPHN2ZyB4PSIyNSIgeT0iMjUiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xMiAyQzEzLjEgMiAxNCAxIDEyIDJDNy41IDUgNyA5IDcgMTJDNyAxNS41IDkuNSAxOCAxMyAxOEMxNi41IDE4IDE5IDE1LjUgMTkgMTJDMTkgOS41IDE2LjUgNyAxMyA3QzkuNSA3IDcgOS41IDcgMTJaIi8+Cjwvc3ZnPgo8L3N2Zz4K"
+                                alt="Avatar">
+                        </div>
+                        <div class="profile-details">
+                            <h3>Usuário</h3>
+                            <p>Membro desde 2024</p>
+                            <div class="profile-stats">
+                                <div class="stat">
+                                    <span class="stat-number" id="userPostsCount">0</span>
+                                    <span class="stat-label">Anúncios</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-number" id="userFavoritesCount">0</span>
+                                    <span class="stat-label">Favoritos</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-posts">
+                        <h3>Meus Anúncios</h3>
+                        <div class="user-posts-grid" id="userPostsGrid">
+                            <!-- User posts will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Favorites Page -->
+        <div id="favoritesPage" class="page">
+            <div class="favorites-container">
+                <div class="favorites-header">
+                    <button class="btn-back" onclick="showHomePage()">← Voltar</button>
+                    <h2>Meus Favoritos</h2>
+                </div>
+                <div class="favorites-grid" id="favoritesGrid">
+                    <!-- Favorite posts will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer --> 
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>EscambOnline</h4>
+                <p>A melhor plataforma para trocas e vendas online</p>
+            </div>
+            <div class="footer-section">
+                <h4>Categorias</h4>
+                <a href="#">Eletrônicos</a>
+                <a href="#">Móveis</a>
+                <a href="#">Games</a>
+                <a href="#">Roupas</a>
+            </div>
+            <div class="footer-section">
+                <h4>Suporte</h4>
+                <a href="#">Ajuda</a>
+                <a href="#">Contato</a>
+                <a href="#">Termos de Uso</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
