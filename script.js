@@ -2,9 +2,9 @@
 let posts = [];
 let favorites = [];
 let currentUser = {
-    name: 'Usuário',
+    name: 'Super User',
     posts: [],
-    joinDate: '2024'
+    joinDate: '2025'
 };
 let currentFilter = '';
 let searchTerm = '';
@@ -47,7 +47,7 @@ const samplePosts = [
         date: new Date('2024-09-11'),
         author: 'Carlos Oliveira'
     },
-    
+
 ];
 
 // Initialize app
@@ -126,7 +126,15 @@ function showPostDetail(postId) {
     const post = posts.find(p => p.id === postId);
     if (!post) return;
 
+    currentDetailPostId = postId;
+
     showPage('postDetailPage');
+
+    const rating = loadRating(post.id);
+    const starsHtml = Array.from({ length: 5 }, (_, i) => {
+        const val = i + 1;
+        return `<span class="star ${val <= rating ? 'filled' : ''}" data-value="${val}" data-post="${post.id}">★</span>`;
+    }).join('');
 
     const content = document.getElementById('postDetailContent');
     content.innerHTML = `
@@ -148,6 +156,7 @@ function showPostDetail(postId) {
                     <p><strong>Localização:</strong> ${post.location.replace('-', ' ')}</p>
                     <p><strong>Anunciante:</strong> ${post.author}</p>
                     <p><strong>Publicado em:</strong> ${formatDate(post.date)}</p>
+                    <div class="rating">${starsHtml}</div>
                     <button class="btn-primary" onclick="toggleFavorite(${post.id})" style="margin-top: 1rem; width: 100%;">
                         ${favorites.includes(post.id) ? '❤️ Remover dos Favoritos' : '🤍 Adicionar aos Favoritos'}
                     </button>
@@ -269,7 +278,14 @@ function renderPosts(postsToRender = null) {
         return;
     }
 
-    grid.innerHTML = postsToShow.map(post => `
+    grid.innerHTML = postsToShow.map(post => {
+        const rating = loadRating(post.id);
+        const starsHtml = Array.from({ length: 5 }, (_, i) => {
+            const val = i + 1;
+            return `<span class="star ${val <= rating ? 'filled' : ''}" data-value="${val}" data-post="${post.id}">★</span>`;
+        }).join('');
+
+        return `
         <div class="post-card" onclick="showPostDetail(${post.id})">
             <div class="post-image">
                 <img src="${post.images[0]}" alt="${post.title}">
@@ -284,13 +300,15 @@ function renderPosts(postsToRender = null) {
                 <p class="post-description">${post.description}</p>
                 <div class="post-price">R$ ${post.price.toFixed(2)}</div>
                 <div class="post-location">📍 ${post.location.replace('-', ' ')} </div>
+                <div class="rating" data-post="${post.id}">${starsHtml}</div>
                 <div class="post-actions">
                     <button class="btn-chat" onclick="event.stopPropagation(); startChat('${post.author}', ${post.id})">💬 Chat</button>
                     <button class="btn-contact" onclick="event.stopPropagation(); showContact('${post.author}')">📱 Contato</button>
                 </div>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 function renderUserPosts() {
@@ -339,6 +357,27 @@ function renderFavorites() {
     renderPosts(favoritePosts);
     // Update the grid content for favorites page
     grid.innerHTML = document.getElementById('postsGrid').innerHTML;
+}
+
+// Ratings: persistência por post (0-5)
+let currentDetailPostId = null;
+function ratingStorageKey(postId) {
+    return `trocaonline_rating_${postId}`;
+}
+function loadRating(postId) {
+    try {
+        const raw = localStorage.getItem(ratingStorageKey(postId));
+        return raw ? parseInt(raw, 10) : 0;
+    } catch (err) {
+        return 0;
+    }
+}
+function saveRating(postId, value) {
+    try {
+        localStorage.setItem(ratingStorageKey(postId), String(value));
+    } catch (err) {
+        console.error('Erro ao salvar rating', err);
+    }
 }
 
 // Filtering and search functions
@@ -532,6 +571,33 @@ function showContact(author) {
 document.getElementById('searchInput').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
         searchItems();
+    }
+});
+
+// Delegation para clique nas estrelas
+document.addEventListener('click', function (e) {
+    const el = e.target;
+    if (!el.classList.contains('star')) return;
+
+    // evita que o click suba e abra o detalhe
+    e.stopPropagation();
+
+    const postId = Number(el.dataset.post);
+    const value = Number(el.dataset.value);
+    const current = loadRating(postId);
+    const newValue = current === value ? 0 : value; // clique no mesmo valor limpa para 0
+
+    saveRating(postId, newValue);
+
+    // Atualiza UI para todos os componentes rating do mesmo post
+    document.querySelectorAll(`.rating[data-post="${postId}"] .star`).forEach(s => {
+        const v = Number(s.dataset.value);
+        if (v <= newValue) s.classList.add('filled'); else s.classList.remove('filled');
+    });
+
+    // Se estiver na página de detalhe desse post, re-renderiza (para atualizar qualquer conteúdo relacionado)
+    if (currentDetailPostId === postId && document.getElementById('postDetailPage').classList.contains('active')) {
+        showPostDetail(postId);
     }
 });
 

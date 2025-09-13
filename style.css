@@ -57,7 +57,7 @@ body {
     right: 5px;
     top: 50%;
     transform: translateY(-50%);
-    background:#ecd41e;
+    background: #ecd41e;
     border: none;
     color: white;
     padding: 0.5rem 1rem;
@@ -256,7 +256,7 @@ body {
 }
 
 .favorite-btn.active {
-    color:#ecd41e;
+    color: #ecd41e;
 }
 
 .post-content {
@@ -283,7 +283,7 @@ body {
 .post-price {
     font-size: 1.3rem;
     font-weight: bold;
-    color:#ecd41e;
+    color: #ecd41e;
     margin-bottom: 0.5rem;
 }
 
@@ -427,7 +427,7 @@ body {
 }
 
 .btn-create {
-    background:#ecd41e;
+    background: #ecd41e;
     color: white;
     border: none;
     padding: 1rem 2rem;
@@ -667,6 +667,36 @@ body {
 
 .chat-form button:hover {
     background: #3a8b8a;
+}
+
+/* Rating stars */
+.rating {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.rating .star {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background: transparent;
+    cursor: pointer;
+    color: #ddd;
+    font-size: 20px;
+    line-height: 20px;
+    transition: color 0.15s;
+}
+
+.rating .star.filled {
+    color: #ffd166;
+    /* gold-ish */
+}
+
+.rating.small .star {
+    width: 16px;
+    height: 16px;
+    font-size: 16px
 }
 
 /* Responsive Design */
